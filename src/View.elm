@@ -37,8 +37,16 @@ element walls ( width, height ) ( x, y ) =
                 solveRays walls rayPosition
                   |> List.sortBy (.vector >> .angle)
 
-              cycled =
-                solutions ++ (List.take 1 solutions)
+              first = List.head solutions
+              last = List.head <| List.reverse solutions
+              cycled = case (first, last) of
+                (Just first, Just last) ->
+                  if abs (first.vector.angle - last.vector.angle) > degrees 180 then
+                    solutions ++ (List.take 1 solutions)
+                  else
+                    solutions
+                _ ->
+                  solutions
              in
               List.map2 (,) cycled (List.tail cycled |> Maybe.withDefault [])
                 |> List.map (drawTriangles rayColor)
